@@ -1,6 +1,7 @@
 require 'object_tree'
 
-p tree = ObjectTree::Tree.create(BasicObject, true)
-#obj_list = tree.object_list
-#obj_list = tree.object_tree(obj_list)
+tree = ObjectTree::Tree.create(Object)
+tree.draw
+
+tree = ObjectTree::Tree.create(Numeric, true)
 tree.draw

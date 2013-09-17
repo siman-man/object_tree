@@ -38,16 +38,15 @@ module ObjectTree
       end
     end
 
-
     def singleton(klass)
       class << klass; self end
     end
 
     def object_list(klass)
-      ObjectSpace.each_object(singleton(klass)) do |sub| 
-        if klass != sub
-          @tree[klass] << sub
-          object_list(sub) unless @tree.has_key?(sub)
+      ObjectSpace.each_object(singleton(klass)) do |subclass| 
+        if klass != subclass
+          @tree[klass] << subclass
+          object_list(subclass) unless @tree.has_key?(subclass)
         end
       end
 
@@ -57,9 +56,9 @@ module ObjectTree
     def object_list_in_module(klass)
       @tree[klass] = klass.ancestors[0..klass.ancestors.index(@superclass)-@diff].reverse
 
-      ObjectSpace.each_object(singleton(klass)) do |sub| 
-        if klass != sub
-          object_list_in_module(sub) unless @tree.has_key?(sub)
+      ObjectSpace.each_object(singleton(klass)) do |subclass|
+        if klass != subclass
+          object_list_in_module(subclass) unless @tree.has_key?(subclass)
         end
       end
 
@@ -74,7 +73,6 @@ module ObjectTree
           end
         end
       end
-      tree
     end
 
     def create_tree(key, value)
@@ -107,9 +105,9 @@ module ObjectTree
     end
 
     def draw_tree(node, nest, root = true, last = false)
-      if nest > 0 
-        @last_list[nest-1] = last
-      end
+
+      @last_list[nest-1] = last if nest > 0
+
       node.each do |key, value|
         puts key
         next if @check_list[key]
@@ -118,12 +116,7 @@ module ObjectTree
         value.each do |v|
           @last_list[nest] = true if v == value.last
 
-          if !root && !last
-            nest.times do |index|
-              print @last_list[index]? "  " : "│ "
-              print " " * SPACE_SIZE
-            end
-          elsif nest > 0 && last
+          if (!root && !last) || (nest > 0 && last)
             nest.times do |index|
               print (@last_list[index])? "  " : "│ "
               print " " * SPACE_SIZE
