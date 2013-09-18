@@ -11,7 +11,7 @@ module ObjectTree
 
   class Tree
     attr_reader :tree
-    SPACE_SIZE = 6
+    SPACE_SIZE = 8
 
     def initialize(klass, mod = false)
       @tree = Hash.new{|h, k| h[k] = [] }
@@ -73,12 +73,12 @@ module ObjectTree
       @tree
     end
 
-    def object_list_in_module(klass)
-      @tree[klass] = klass.ancestors[0..klass.ancestors.index(@superclass)-@diff].reverse
+    def object_list_in_module(klass, nest = 0)
+      @tree[klass] = klass.ancestors[0..klass.ancestors.find_index(@superclass)-@diff].reverse
 
       ObjectSpace.each_object(singleton(klass)) do |subclass|
         if klass != subclass
-          object_list_in_module(subclass) unless @tree.has_key?(subclass)
+          object_list_in_module(subclass, (nest + 1)) unless @tree.has_key?(subclass)
         end
       end
 
@@ -86,6 +86,7 @@ module ObjectTree
     end
 
     def create_object_tree(tree)
+      p @tree
       tree.each do |key1 , value1|
         tree.each do |key2, value2|
           if key1 > key2
@@ -93,6 +94,7 @@ module ObjectTree
           end
         end
       end
+      p @tree
 
       tree
     end
@@ -100,7 +102,9 @@ module ObjectTree
     def create_tree_module(tree)
       tree.each do |key, value|
         value.each_cons(2) do |k, v|
-          @tree_in_module[k] << v unless @tree_in_module[k].include?(v)
+          if !@tree_in_module[k].include?(v) && !@tree_in_module.has_key?(v)
+            @tree_in_module[k] << v 
+          end
         end
       end
 
@@ -112,33 +116,31 @@ module ObjectTree
       @tree.each do |key1 , value1|
         @tree.each do |key2, value2|
           if compare_object(key1, key2)
-            @tree[key2] -= (value1 - [key1])
+            @tree[key2] -= [key1]
           end
         end
       end
 
       @tree = create_tree_module(@tree)
-
-      @tree_in_module = create_object_tree(@tree_in_module)
     end
 
     def draw
       @last_list = []
       @node = (@mod)? @tree_in_module : @tree
-      p @node
       if @node.size.zero? 
         puts @klass
       else
-        draw_tree(@node.first, 0)
+        draw_tree({ @node.first.first => @node.first.last }, 0)
       end
     end
 
     def draw_tree(tree, nest, root = true, last = false)
 
       @last_list[nest-1] = last if nest > 0
-      p tree
 
       tree.each do |key, value|
+
+        print ( key.class == Class )? "<C>" : "<M>"
         puts key
 
         value.each do |v|
@@ -161,6 +163,7 @@ module ObjectTree
             end
           else
             print ( v == value.last )? "└─ ─ ── " : "├─ ─ ── "
+            print ( v.class == Class )? "<C>" : "<M>"
             p v
           end
         end
