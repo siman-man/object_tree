@@ -2,6 +2,13 @@
 require "object_tree/version"
 
 module ObjectTree
+  class Module
+    def prepended_modules
+      ancestors = self.ancestors
+      ancestors[0..ancestors.find_index(self)] - [self]
+    end 
+  end
+
   class Tree
     attr_reader :tree
     SPACE_SIZE = 6
@@ -9,6 +16,7 @@ module ObjectTree
     def initialize(klass, mod = false)
       @tree = Hash.new{|h, k| h[k] = [] }
       @mod = mod
+      @klass = klass
       @check_list = Hash.new
       @diff = 1
 
@@ -42,6 +50,18 @@ module ObjectTree
       class << klass; self end
     end
 
+    def compare_object(a, b)
+      if a.class == Class && b.class == Class
+        a > b
+      elsif a.class == Class && b.class == Module
+        a.prepended_modules.include?(b)
+      elsif a.class == Module && b.class == Class
+        !b.prepended_modules.include?(a)
+      elsif a.class == Module && b.class == Module
+        a.prepended_modules.include?(b)
+      end
+    end
+
     def object_list(klass)
       ObjectSpace.each_object(singleton(klass)) do |subclass| 
         if klass != subclass
@@ -73,45 +93,53 @@ module ObjectTree
           end
         end
       end
+
+      tree
     end
 
-    def create_tree(key, value)
-      (value.size-1).times do |index|
-        @tree_in_module[value[index]] << value[index+1] unless @tree_in_module[value[index]].include?(value[index+1])
+    def create_tree_module(tree)
+      tree.each do |key, value|
+        value.each_cons(2) do |k, v|
+          @tree_in_module[k] << v unless @tree_in_module[k].include?(v)
+        end
+      end
 
-        if value[index+1] == value.last
-          @tree.delete(key)
-          @tree.each do |k, v|
-            if v.first == key
-              v.first = value.last
-              @tree[k] = v
-            end
+      @tree_in_module
+    end 
+
+
+    def create_object_tree_in_module
+      @tree.each do |key1 , value1|
+        @tree.each do |key2, value2|
+          if compare_object(key1, key2)
+            @tree[key2] -= (value1 - [key1])
           end
         end
       end
-    end
 
-    def create_object_tree_in_module
-      @tree.each do |key, value|
-        create_tree(key, value)
-      end
+      @tree = create_tree_module(@tree)
+
+      @tree_in_module = create_object_tree(@tree_in_module)
     end
 
     def draw
       @last_list = []
       @node = (@mod)? @tree_in_module : @tree
-      @node.each{|k, v| v.uniq! }
-      draw_tree(@node, 0)
+      p @node
+      if @node.size.zero? 
+        puts @klass
+      else
+        draw_tree(@node.first, 0)
+      end
     end
 
-    def draw_tree(node, nest, root = true, last = false)
+    def draw_tree(tree, nest, root = true, last = false)
 
       @last_list[nest-1] = last if nest > 0
+      p tree
 
-      node.each do |key, value|
+      tree.each do |key, value|
         puts key
-        next if @check_list[key]
-        @check_list[key] = true
 
         value.each do |v|
           @last_list[nest] = true if v == value.last
@@ -123,10 +151,7 @@ module ObjectTree
             end
           end
 
-          unless @node.has_key?(v)
-            print ( v == value.last )? "└─ ─ ── " : "├─ ─ ── "
-            p v
-          else
+          if @node.has_key?(v)
             if v == value.last
               print "└─ ─ ── "
               draw_tree({ v => @node[v]}, nest + 1, false, true)
@@ -134,10 +159,11 @@ module ObjectTree
               print "├─ ─ ── "
               draw_tree({ v => @node[v]}, nest + 1, false, false)
             end
+          else
+            print ( v == value.last )? "└─ ─ ── " : "├─ ─ ── "
+            p v
           end
         end
-
-        @node.delete(key)
       end
     end
   end
