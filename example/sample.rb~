@@ -1,32 +1,35 @@
 require 'object_tree'
-require 'active_record'
-
-module E
-end
 
 module D
-  prepend E
+end
+
+module E
 end
 
 module F
 end
 
-module C
-  include D
+module G
 end
 
-class A
+class A 
   prepend F
 end
 
 class B < A
-  prepend C
+  include D
+  include E
+  prepend G
+end
+
+class C < A
+  include E
+  include D
 end
 
 
-tree = ObjectTree::Tree.create(Numeric)
+tree = ObjectTree::Tree.create(A)
 tree.draw
 
-#tree = ObjectTree::Tree.create(Numeric, true)
-tree = ObjectTree::Tree.create(Arel::Nodes::Node, true)
+tree = ObjectTree::Tree.create(A, true)
 tree.draw

@@ -1,65 +1,45 @@
 # encoding: utf-8
 require "object_tree/version"
 
-module ObjectTree
-  class Module
-    def prepended_modules
-      ancestors = self.ancestors
-      ancestors[0..ancestors.find_index(self)] - [self]
-    end 
+class Module
+  def prepended_modules
+    ancestors = self.ancestors
+    ancestors[0..ancestors.find_index(self)] - [self]
   end
+end
+
+module ObjectTree
 
   class Tree
     attr_reader :tree
-    SPACE_SIZE = 8
+    SPACE_SIZE = 6
+    MCOLOR = 33
+    CCOLOR = 32
 
-    def initialize(klass, mod = false)
+    def initialize(klass, mflag = false)
       @tree = Hash.new{|h, k| h[k] = [] }
-      @mod = mod
+      @mflag = mflag
       @klass = klass
-      @check_list = Hash.new
-      @diff = 1
 
       if klass == BasicObject
         klass = Object
-        @diff = 0
         @superclass = BasicObject
-        if mod
-          @tree[BasicObject] << Kernel
+        if mflag
+          @tree[BasicObject] << Object
         end
       else
         @superclass = klass.superclass
       end
 
-      if mod
-        @tree_in_module = Hash.new{|h, k| h[k] = [] }
-        object_list_in_module(klass)
-        create_object_tree_in_module
-      else
-        create_object_tree(object_list(klass))
-      end
+      create_object_tree(object_list(klass))
     end
 
     class << self
-      def create(klass, mod = false)
-        Tree.new(klass, mod)
-      end
+      alias :create :new
     end
 
     def singleton(klass)
       class << klass; self end
-    end
-
-    def compare_object(a, b)
-      if a.class == Class && b.class == Class
-        a > b
-      elsif a.class == Class && b.class == Module
-        a.prepended_modules.include?(b)
-      elsif a.class == Module && b.class == Class
-        !b.prepended_modules.include?(a)
-      elsif a.class == Module && b.class == Module
-        a.prepended_modules.include?(b)
-      end
     end
 
     def object_list(klass)
@@ -73,20 +53,7 @@ module ObjectTree
       @tree
     end
 
-    def object_list_in_module(klass, nest = 0)
-      @tree[klass] = klass.ancestors[0..klass.ancestors.find_index(@superclass)-@diff].reverse
-
-      ObjectSpace.each_object(singleton(klass)) do |subclass|
-        if klass != subclass
-          object_list_in_module(subclass, (nest + 1)) unless @tree.has_key?(subclass)
-        end
-      end
-
-      @tree
-    end
-
     def create_object_tree(tree)
-      p @tree
       tree.each do |key1 , value1|
         tree.each do |key2, value2|
           if key1 > key2
@@ -94,77 +61,90 @@ module ObjectTree
           end
         end
       end
-      p @tree
 
       tree
     end
 
-    def create_tree_module(tree)
-      tree.each do |key, value|
-        value.each_cons(2) do |k, v|
-          if !@tree_in_module[k].include?(v) && !@tree_in_module.has_key?(k)
-            @tree_in_module[k] << v 
-          end
-        end
-      end
-
-      @tree_in_module
-    end 
-
-
-    def create_object_tree_in_module
-      @tree.each do |key1 , value1|
-        @tree.each do |key2, value2|
-          if compare_object(key1, key2)
-            @tree[key2] -= [key1]
-          end
-        end
-      end
-
-      @tree = create_tree_module(@tree)
-    end
-
     def draw
-      @last_list = []
-      @node = (@mod)? @tree_in_module : @tree
-      if @node.size.zero? 
+      @last_check = []
+      if @tree.size.zero? 
         puts @klass
       else
-        draw_tree({ @node.first.first => @node.first.last }, 0)
+        draw_tree({ @tree.first.first => @tree.first.last }, 0)
       end
     end
 
     def draw_tree(tree, nest, root = true, last = false)
 
-      @last_list[nest-1] = last if nest > 0
+      @last_check[nest-1] = last if nest > 0
 
       tree.each do |key, value|
-
-        print ( key.class == Class )? "<C>" : "<M>"
-        puts key
-
-        value.each do |v|
-          @last_list[nest] = true if v == value.last
-
-          if (!root && !last) || (nest > 0 && last)
+        if ( @mflag && key.kind_of?(Class) && !key.superclass.nil? )
+          module_list = key.ancestors[0..key.ancestors.find_index(key.superclass)-1].reverse - [key, key.superclass] - key.prepended_modules
+          module_list.each_with_index do |m, add|
+            puts "<M>\e[#{MCOLOR}m#{m.name}\e[m"
+            @last_check[nest] = true
             nest.times do |index|
-              print (@last_list[index])? "  " : "│ "
+              print (@last_check[index])? "  " : "│ "
               print " " * SPACE_SIZE
             end
+            print "└─ ─ ── "
+            nest += 1
+          end
+        end
+
+        print ( key.kind_of?(Class) )? "<C>\e[#{CCOLOR}m" : "<M>\e[#{MCOLOR}m"
+        puts "#{key.name}\e[m"
+
+        value.each do |v|
+          @last_check[nest] = true if v == value.last
+
+          nest.times do |index|
+            print (@last_check[index])? "  " : "│ "
+            print " " * SPACE_SIZE
           end
 
-          if @node.has_key?(v)
+          if @tree.has_key?(v)
+            print ( v == value.last )? "└─ ─ ── " : "├─ ─ ── "
             if v == value.last
-              print "└─ ─ ── "
-              draw_tree({ v => @node[v]}, nest + 1, false, true)
+              draw_tree({ v => @tree[v]}, nest + 1, false, true)
             else
-              print "├─ ─ ── "
-              draw_tree({ v => @node[v]}, nest + 1, false, false)
+              draw_tree({ v => @tree[v]}, nest + 1, false, false)
             end
           else
             print ( v == value.last )? "└─ ─ ── " : "├─ ─ ── "
-            print ( v.class == Class )? "<C>" : "<M>"
-            p v
+            nest_num = 0
+            if( @mflag && v.kind_of?(Class) ) 
+              module_list = v.ancestors[0..v.ancestors.find_index(key)-1].reverse - [v, key] - v.prepended_modules
+              @last_check[nest] = ( v == value.last )? true : false
+              module_list.each_with_index do |m, add|
+                print "<M>\e[#{MCOLOR}m"
+                puts "#{m.name}\e[m"
+                @last_check[nest+add+1] = true
+                (nest+add+1).times do |index|
+                  print (@last_check[index])? "  " : "│ "
+                  print " " * SPACE_SIZE
+                end
+                print "└─ ─ ── "
+                nest_num += 1
+              end
+            end
+            print ( v.kind_of?(Class) )? "<C>\e[#{CCOLOR}m" : "<M>\e[#{MCOLOR}m"
+            puts "#{v.name}\e[m"
+
+            if ( @mflag && v.kind_of?(Class) )
+              prepended_modules = v.prepended_modules
+              prepended_modules.each_with_index do |m, add|
+                (nest+add+1).times do |index|
+                  print (@last_check[index])? "  " : "│ "
+                  print " " * SPACE_SIZE
+                end
+                print "└─ ─ ── "
+                print "<M>\e[#{MCOLOR}m"
+                puts "#{m.name}\e[m"
+                @last_check[nest+add+1] = true
+              end
+            end
           end
         end
       end

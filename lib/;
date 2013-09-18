@@ -1,14 +1,13 @@
 # encoding: utf-8
 require "object_tree/version"
 
-class Module
-  def prepended_modules
-    ancestors = self.ancestors
-    ancestors[0..ancestors.find_index(self)] - [self]
-  end
-end
-
 module ObjectTree
+  class Class
+    def prepended_modules
+      ancestors = self.ancestors
+      ancestors[0..ancestors.find_index(self)] - [self]
+    end 
+  end
 
   class Tree
     attr_reader :tree
@@ -79,8 +78,8 @@ module ObjectTree
       @last_check[nest-1] = last if nest > 0
 
       tree.each do |key, value|
-        if ( @mflag && key.kind_of?(Class) && !key.superclass.nil? )
-          module_list = key.ancestors[0..key.ancestors.find_index(key.superclass)-1].reverse - [key, key.superclass] - key.prepended_modules
+        if ( @mflag && key.class == Class && !key.superclass.nil? )
+          module_list = key.ancestors[0..key.ancestors.find_index(key.superclass)-1].reverse - ([key, key.superclass] + key.prepended_modules)
           module_list.each_with_index do |m, add|
             puts "<M>\e[#{MCOLOR}m#{m.name}\e[m"
             @last_check[nest] = true
@@ -93,7 +92,7 @@ module ObjectTree
           end
         end
 
-        print ( key.kind_of?(Class) )? "<C>\e[#{CCOLOR}m" : "<M>\e[#{MCOLOR}m"
+        print ( key.class == Class )? "<C>\e[#{CCOLOR}m" : "<M>\e[#{MCOLOR}m"
         puts "#{key.name}\e[m"
 
         value.each do |v|
@@ -113,9 +112,8 @@ module ObjectTree
             end
           else
             print ( v == value.last )? "└─ ─ ── " : "├─ ─ ── "
-            nest_num = 0
-            if( @mflag && v.kind_of?(Class) ) 
-              module_list = v.ancestors[0..v.ancestors.find_index(key)-1].reverse - [v, key] - v.prepended_modules
+            if( @mflag && v.class == Class ) 
+              module_list = v.ancestors[0..v.ancestors.find_index(key)-1].reverse - ([v, key] + key.prepended_modules)
               @last_check[nest] = ( v == value.last )? true : false
               module_list.each_with_index do |m, add|
                 print "<M>\e[#{MCOLOR}m"
@@ -126,25 +124,10 @@ module ObjectTree
                   print " " * SPACE_SIZE
                 end
                 print "└─ ─ ── "
-                nest_num += 1
               end
             end
-            print ( v.kind_of?(Class) )? "<C>\e[#{CCOLOR}m" : "<M>\e[#{MCOLOR}m"
+            print ( v.class == Class )? "<C>\e[#{CCOLOR}m" : "<M>\e[#{MCOLOR}m"
             puts "#{v.name}\e[m"
-
-            if ( @mflag && v.kind_of?(Class) )
-              prepended_modules = v.prepended_modules
-              prepended_modules.each_with_index do |m, add|
-                (nest+nest_num+add+1).times do |index|
-                  print (@last_check[index])? "  " : "│ "
-                  print " " * SPACE_SIZE
-                end
-                print "└─ ─ ── "
-                print "<M>\e[#{MCOLOR}m"
-                puts "#{m.name}\e[m"
-                @last_check[nest+add+1] = true
-              end
-            end
           end
         end
       end
