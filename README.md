@@ -1,6 +1,6 @@
 # ObjectTree
 
-TODO: Write a gem description
+Rubyのオブジェクト関係をtreeっぽく表示
 
 ## Installation
 
@@ -18,7 +18,10 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+Object以下のクラス関係を表示
+
+tree = ObjectTree::Tree.create(Object)
+tree.draw
 
 ## Contributing
 
