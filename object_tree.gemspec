@@ -8,9 +8,9 @@ Gem::Specification.new do |spec|
   spec.version       = ObjectTree::VERSION
   spec.authors       = ["siman-man"]
   spec.email         = ["k128585@ie.u-ryukyu.ac.jp"]
-  spec.description   = "this is object tree"
-  spec.summary       = "hoge piyo"
-  spec.homepage      = ""
+  spec.description   = "this is ruby object tree show like tree commnad!"
+  spec.summary       = "tree command like show object hierarchy"
+  spec.homepage      = "https://github.com/siman-man/object_tree"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files`.split($/)

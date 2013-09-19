@@ -1,5 +1,4 @@
 require 'object_tree'
-require 'rails'
 
 module D
 end
@@ -7,24 +6,16 @@ end
 module E
 end
 
-module F
-end
-
-class A 
-end
-
-module C
-end
-
-class B < A
-  include C
+class A
   include D
 end
 
-tree = ObjectTree::Tree.create(Object)
-tree.draw
+class B < A
+end
 
-puts 
+class C < A
+  include E
+end
 
-tree = ObjectTree::Tree.create(Object, true)
+tree = ObjectTree::Tree.create(A, true)
 tree.draw
