@@ -1,5 +1,5 @@
 require 'object_tree'
-require 'active_record'
+require 'rails'
 
 module D
 end
@@ -10,30 +10,23 @@ end
 module F
 end
 
-module G
-end
-
 class A 
-  prepend F
 end
 
-class H
+module C
 end
 
 class B < A
-  include D
-  include E
-  prepend G
-end
-
-class C < A
-  include E
+  include C
   include D
 end
 
 
-tree = ObjectTree::Tree.create(A)
+
+tree = ObjectTree::Tree.create(Object)
 tree.draw
 
-tree = ObjectTree::Tree.create(A, true)
+puts 
+
+tree = ObjectTree::Tree.create(Object, true)
 tree.draw
