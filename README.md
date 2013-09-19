@@ -1,6 +1,7 @@
 # ObjectTree
 
 Rubyのオブジェクト関係をtreeっぽく表示
+1.8の対応はまだ出来ていません。
 
 ## Installation
 
