@@ -5,17 +5,13 @@ Rubyのオブジェクト関係をtreeっぽく表示
 
 ## Installation
 
-Add this line to your application's Gemfile:
-
-    gem 'object_tree'
-
-And then execute:
-
-    $ bundle
-
 Or install it yourself as:
 
     $ gem install object_tree
+    
+Add this line to your application's Gemfile:
+
+    gem 'object_tree'
 
 ## Usage
 
