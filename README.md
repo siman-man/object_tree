@@ -18,10 +18,28 @@ Or install it yourself as:
 
 ## Usage
 
-Object以下のクラス関係を表示
+require 'object_tree'
 
-tree = ObjectTree::Tree.create(Object)
+class A
+end
+
+class B < A
+end
+
+class C < A
+end
+
+tree = ObjectTree::Tree.create(A)
 tree.draw
+
+
+実行すると
+
+<C>A
+├─ ─ ── <C>C
+└─ ─ ── <C>B
+
+こんな感じでtreeっぽく継承関係を出力してくれる。
 
 ## Contributing
 
