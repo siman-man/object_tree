@@ -16,6 +16,9 @@ class A
   prepend F
 end
 
+class H
+end
+
 class B < A
   include D
   include E
@@ -28,8 +31,8 @@ class C < A
 end
 
 
-tree = ObjectTree::Tree.create(A)
+tree = ObjectTree::Tree.create(BasicObject)
 tree.draw
 
-tree = ObjectTree::Tree.create(A, true)
+tree = ObjectTree::Tree.create(H, true)
 tree.draw
