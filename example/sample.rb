@@ -23,5 +23,5 @@ tree.draw
 puts
 
 # include module
-tree = ObjectTree::Tree.create(A, true)
+tree = ObjectTree::Tree.create(BasicObject, true)
 tree.draw

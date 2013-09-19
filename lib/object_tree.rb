@@ -22,7 +22,7 @@ module ObjectTree
       @mflag = mflag
       @root_class = klass
 
-      if RUBY_VERSION >= "1.9" && klass == OasicObject
+      if RUBY_VERSION >= "1.9" && klass == BasicObject
         klass = Object
         @tree[BasicObject] << Object
       end
