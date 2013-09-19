@@ -1,4 +1,5 @@
 require 'object_tree'
+require 'active_record'
 
 module D
 end
@@ -31,8 +32,8 @@ class C < A
 end
 
 
-tree = ObjectTree::Tree.create(BasicObject)
+tree = ObjectTree::Tree.create(A)
 tree.draw
 
-tree = ObjectTree::Tree.create(H, true)
+tree = ObjectTree::Tree.create(A, true)
 tree.draw
