@@ -1,4 +1,5 @@
 require 'object_tree'
+require 'rails'
 
 module D
 end

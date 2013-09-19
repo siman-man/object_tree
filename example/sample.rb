@@ -21,8 +21,6 @@ class B < A
   include D
 end
 
-
-
 tree = ObjectTree::Tree.create(Object)
 tree.draw
 
