@@ -22,7 +22,7 @@ module ObjectTree
       @mflag = mflag
       @root_class = klass
 
-      if klass == BasicObject
+      if RUBY_VERSION >= "1.9" && klass == OasicObject
         klass = Object
         @tree[BasicObject] << Object
       end
@@ -107,7 +107,7 @@ module ObjectTree
               draw_tree({ sub => @tree[sub]}, nest + 1, false, false)
             end
           else
-            print ( sub == subclasses.last )? "└─ ─ ── " : "├─ ─ ── "
+            print "#{( sub == subclasses.last )? '└─ ─ ── ' : '├─ ─ ── '}"
             nest_count = 0
             if( @mflag && sub.kind_of?(Class) ) 
               module_list = sub.ancestors[0..sub.ancestors.find_index(klass)-1].reverse - ([sub, klass] + sub.prepended_modules)

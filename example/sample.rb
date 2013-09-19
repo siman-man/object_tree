@@ -17,5 +17,11 @@ class C < A
   include E
 end
 
+tree = ObjectTree::Tree.create(A)
+tree.draw
+
+puts
+
+# include module
 tree = ObjectTree::Tree.create(A, true)
 tree.draw
