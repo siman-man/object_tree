@@ -18,6 +18,7 @@ Or install it yourself as:
 
 ## Usage
 
+``` ruby
 require 'object_tree'
 
 class A
@@ -31,15 +32,16 @@ end
 
 tree = ObjectTree::Tree.create(A)
 tree.draw
+```
 
-
-実行すると
-
+```zsh
 <C>A
 ├─ ─ ── <C>C
 └─ ─ ── <C>B
+```
 
-こんな感じでtreeっぽく継承関係を出力してくれる。
+こんな感じでtreeっぽく出力してくれる。
+
 
 ## Contributing
 
