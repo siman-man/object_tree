@@ -9,5 +9,5 @@ end
 class C < A
 end
 
-tree = ObjectTree::Tree.create(BasicObject, true)
+tree = ObjectTree::Tree.create(A, true)
 tree.draw

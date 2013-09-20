@@ -83,9 +83,9 @@ module ObjectTree
             @last_check[nest] = true
 
             nest.times do |column_number|
-              print ((@last_check[column_number])? "  " : "│ ") + " " * SPACE_SIZE
+              print ((@last_check[column_number])? " " : "│") + " " * SPACE_SIZE
             end
-            print "└────"
+            print "└──── "
             nest += 1
           end
         end
@@ -96,7 +96,7 @@ module ObjectTree
           @last_check[nest] = true if sub == subclasses.last
 
           nest.times do |column_number|
-            print ((@last_check[column_number])? "  " : "│ ") + " " * SPACE_SIZE
+            print ((@last_check[column_number])? " " : "│") + " " * SPACE_SIZE
           end
 
           if @tree.has_key?(sub)
@@ -118,7 +118,7 @@ module ObjectTree
                 @last_check[nest+add+1] = true
 
                 (nest+add+1).times do |column_number|
-                  print ((@last_check[column_number])? "  " : "│ ") + " " * SPACE_SIZE
+                  print ((@last_check[column_number])? " " : "│") + " " * SPACE_SIZE
                 end
                 print "└──── "
                 nest_count += 1
@@ -131,7 +131,7 @@ module ObjectTree
 
               prepended_modules.each_with_index do |m, add|
                 (nest+nest_count+add+1).times do |column_number|
-                  print ((@last_check[column_number])? "  " : "│ ") + " " * SPACE_SIZE
+                  print ((@last_check[column_number])? " " : "│") + " " * SPACE_SIZE
                 end
                 puts "└──── \e[#{MCOLOR}m<M>\e[m#{m.inspect}"
                 @last_check[nest+add+1] = true

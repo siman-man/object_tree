@@ -1,18 +1,21 @@
 require 'object_tree'
 
-module D; end
-module E; end
+module D
+end
+
+module E
+end
 
 class A
+  include D
 end
 
 class B < A
-  include D
 end
 
 class C < A
   include E
 end
 
-tree = ObjectTree::Tree.create(A, true)
+tree = ObjectTree::Tree.create(Object, true)
 tree.draw
