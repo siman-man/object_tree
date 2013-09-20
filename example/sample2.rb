@@ -17,5 +17,5 @@ class C < A
   include E
 end
 
-tree = ObjectTree::Tree.create(Object, true)
+tree = ObjectTree::Tree.create(A, true)
 tree.draw
