@@ -1,3 +1,3 @@
-module ObjectTree
-  VERSION = "0.0.10"
+class ObjectTree
+  VERSION = "1.0.0"
 end
