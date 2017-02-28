@@ -2,6 +2,10 @@ require 'fixtures/example'
 
 describe ObjectTree do
   describe 'examples' do
+    it 'no happen infinity loop' do
+      expect(ObjectTree.create(BasicObject)).not_to be_nil
+    end
+
     it 'test case 1' do
       expect =<<-EXPECT
 <C> Case1::A
