@@ -12,6 +12,7 @@ Gem::Specification.new do |spec|
   spec.summary       = "like tree command for Ruby ancestors."
   spec.homepage      = "https://github.com/siman-man/object_tree"
   spec.license       = "MIT"
+  spec.required_ruby_version = '>= 2.0.0'
 
   spec.files         = `git ls-files`.split($/)
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
