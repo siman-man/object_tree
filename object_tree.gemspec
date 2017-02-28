@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.version       = ObjectTree::VERSION
   spec.authors       = ["siman-man"]
   spec.email         = ["k128585@ie.u-ryukyu.ac.jp"]
-  spec.description   = "this is ruby object tree show like tree commnad!"
-  spec.summary       = "tree command like show object hierarchy"
+  spec.description   = "like tree command for Ruby ancestors."
+  spec.summary       = "like tree command for Ruby ancestors."
   spec.homepage      = "https://github.com/siman-man/object_tree"
   spec.license       = "MIT"
 
@@ -18,6 +18,9 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
-  spec.add_development_dependency "bundler", "~> 1.3"
-  spec.add_development_dependency "rake"
+  spec.add_dependency 'colorize'
+
+  spec.add_development_dependency "bundler", "~> 1.14"
+  spec.add_development_dependency "rake", "~> 10.0"
+  spec.add_development_dependency "rspec", "~> 3.0"
 end

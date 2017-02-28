@@ -16,8 +16,8 @@ test/tmp
 test/version_tmp
 tmp
 
-**/*.swp
-*.swp
-**/*~
-*.*~
-*~
+# RubyMine
+.idea
+
+# bundler
+/vendor/bundle

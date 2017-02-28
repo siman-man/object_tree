@@ -1,18 +1,15 @@
 # ObjectTree
 
-Rubyのオブジェクト関係をtreeっぽく表示
-1.8の対応はまだ出来ていません。2.1でも動かないかも、特異メソッドの対応が出来ていません。
+ObjectTree is like tree command for Ruby ancestors.
+
 
 ## Installation
 
-Or install it yourself as:
+```
+$ gem install object_tree
+```
 
-    $ gem install object_tree
     
-Add this line to your application's Gemfile:
-
-    gem 'object_tree'
-
 ## Usage
 
 ``` ruby
@@ -24,21 +21,22 @@ end
 class B < A
 end
 
-class C < A
+class C < B
 end
 
-tree = ObjectTree::Tree.create(A)
-tree.draw
+puts ObjectTree.create(A)
 ```
+
+output
 
 ```zsh
-<C>A
-├──── <C>C
-└──── <C>B
+<C> A
+└───── <C> B
+        └───── <C> C
 ```
 
-こんな感じでtreeっぽく出力してくれる。
 
+more complex pattern
 
 ```ruby
 require 'object_tree'
@@ -60,19 +58,24 @@ class C < A
   include E
 end
 
-tree = ObjectTree::Tree.create(A, true)
-tree.draw
+class F < B
+  include E
+end
+
+puts ObjectTree.create(D)
 ```
 
-```zsh
-<M>D
-└──── <C>A
-       ├──── <M>E
-       │      └──── <C>C
-       └──── <C>B
-```
+output
 
-第二引数をtrueにするとmoduleも表示してくれる。
+```
+<M> D
+└───── <C> A
+        ├───── <C> B
+        │       └───── <M> E
+        │               └───── <C> F
+        └───── <M> E
+                └───── <C> C
+```
 
 
 ## Contributing
