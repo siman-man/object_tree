@@ -1,5 +1,7 @@
 # ObjectTree
 
+[![Build Status](https://travis-ci.org/siman-man/object_tree.svg?branch=master)](https://travis-ci.org/siman-man/object_tree)
+
 ObjectTree is like tree command for Ruby ancestors.
 
 
