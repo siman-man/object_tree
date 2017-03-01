@@ -79,6 +79,35 @@ output
                 └───── <C> C
 ```
 
+can use from terminal by using `rotree` command.
+
+```
+$ rotree Numeric                                                                                                                                       [master]
+```
+
+Ruby 2.3.3
+
+```
+<C> Numeric
+├───── <C> Complex
+├───── <C> Float
+├───── <C> Integer
+│       ├───── <C> Bignum
+│       └───── <C> Fixnum
+└───── <C> Rational
+```
+
+Ruby 2.4.0
+
+```
+<C> Numeric
+├───── <C> Complex
+├───── <C> Float
+├───── <C> Integer
+└───── <C> Rational
+```
+
+you can see unify Fixnum and Bignum into Integer from ruby 2.4.0
 
 ## Contributing
 
