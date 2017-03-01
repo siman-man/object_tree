@@ -9,7 +9,6 @@ opt_parse = OptionParser.new do |opt|
   opt.banner = 'Usage: rotree [options] klass'
   opt.on('-c', '--[no-]color', 'color option [default true]') { |c| options[:color] = c }
   opt.on('-e `klass`', '--exclude', 'Exclude the given class/module name from object_tree.') { |klass| options[:exclude] << klass }
-  opt.on('-i', 'interactive mode') { |i| options[:cli] = true }
   opt.on('-r `library`', 'require the library before executing ObjectTree.create(klass)') { |name| options[:library] << name }
   opt.parse!(ARGV)
 end
@@ -18,35 +17,7 @@ options[:library].each {|r| eval("require '#{r}'") }
 
 ObjectTree::OPTIONS.merge!(options)
 
-if options[:cli]
-  otree = ObjectTree.create(BasicObject)
-  require 'readline'
-  require 'pathname'
-  tree = otree.tree
-  current = Pathname.new("BasicObject")
-  Readline.completion_append_character = nil
-  Readline.completion_proc = proc {|word| tree[current.to_s].grep(/\A#{Regexp.quote word}/) }
-
-  while cmd = Readline.readline("/#{current} $ ", true)
-    cmd.chomp!
-    break if cmd =~ /exit|quit/
-
-    if /^(ls|dir)[[:space:]]*/ =~ cmd
-      puts tree[current.to_s]
-    elsif /^cd[[:space:]]+(?<rp>.*)$/ =~ cmd
-      path = current + rp
-      if tree[path.to_s].nil?
-        puts path
-      else
-        current += rp
-      end
-    else
-      puts cmd
-    end
-
-    Readline.completion_proc = proc {|word| tree[current.to_s].grep(/\A#{Regexp.quote word}/) }
-  end
-elsif ARGV.first.nil?
+if ARGV.first.nil?
   puts opt_parse
 else
   klass = Object.const_get(ARGV.first.to_sym)
