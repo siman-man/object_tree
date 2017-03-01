@@ -46,7 +46,7 @@ class ObjectTree
 
     while sub = modules.shift
       next if OPTIONS[:exclude].include?(sub.to_s)
-      @tree[path.join('/')] << sub.to_s
+      @tree[path.join('/')] << sub
       @queue << get_line(end_line: modules.empty?, space: space)
       parse(sub, space + get_space(end_line: modules.empty?), path: path.dup)
     end
