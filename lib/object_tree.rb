@@ -1,6 +1,9 @@
 require 'colorize'
 
 class ObjectTree
+  attr_reader :tree
+
+  OPTIONS = { color: true, exclude: [], space_size: 8 }
   SPACE_SIZE = 8
   T_LINE = '├─────'
   I_LINE = '│'
@@ -11,12 +14,13 @@ class ObjectTree
   end
 
   def initialize(klass)
+    @tree = Hash.new {|h,k| h[k] = [] }
     @queue = []
     parse(klass)
   end
 
   def to_s
-    @queue.join
+    OPTIONS[:color] ? @queue.join : @queue.join.uncolorize
   end
 
   def output_node(klass)
@@ -32,7 +36,7 @@ class ObjectTree
   end
 
   def get_space(end_line: nil)
-    end_line ? ' ' * SPACE_SIZE : I_LINE + ' ' * (SPACE_SIZE-1)
+    end_line ? ' ' * OPTIONS[:space_size] : I_LINE + ' ' * (OPTIONS[:space_size]-1)
   end
 
   def parse(klass, space = '', path: [])
@@ -40,9 +44,9 @@ class ObjectTree
     modules = get_modules(klass, path.reverse)
     @queue << output_node(klass)
 
-    until modules.empty?
-      sub = modules.shift
-
+    while sub = modules.shift
+      next if OPTIONS[:exclude].include?(sub.to_s)
+      @tree[path.join('/')] << sub.to_s
       @queue << get_line(end_line: modules.empty?, space: space)
       parse(sub, space + get_space(end_line: modules.empty?), path: path.dup)
     end
@@ -54,6 +58,6 @@ class ObjectTree
       if l.each_cons(path.size).include?(path)
         (l[l.index(k)..l.index(klass)] - path).last
       end
-    end.compact.uniq
+    end.compact.uniq.sort_by(&:to_s)
   end
 end
