@@ -28,8 +28,8 @@ describe ObjectTree do
     it 'test case 3' do
       expect =<<-EXPECT
 <C> Case3::A
-├───── <C> Case3::C
-└───── <C> Case3::B
+├───── <C> Case3::B
+└───── <C> Case3::C
       EXPECT
 
       expect(ObjectTree.create(Case3::A).to_s.uncolorize).to eq(expect)
@@ -39,9 +39,9 @@ describe ObjectTree do
       expect =<<-EXPECT
 <M> Case4::D
 └───── <C> Case4::A
-        ├───── <M> Case4::E
-        │       └───── <C> Case4::C
-        └───── <C> Case4::B
+        ├───── <C> Case4::B
+        └───── <M> Case4::E
+                └───── <C> Case4::C
       EXPECT
 
       expect(ObjectTree.create(Case4::D).to_s.uncolorize).to eq(expect)
