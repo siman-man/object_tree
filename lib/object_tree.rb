@@ -14,7 +14,7 @@ class ObjectTree
   end
 
   def initialize(klass)
-    @tree = Hash.new {|h,k| h[k] = [] }
+    @tree = {}
     @queue = []
     parse(klass)
   end
@@ -41,6 +41,7 @@ class ObjectTree
 
   def parse(klass, space = '', path: [])
     path << klass
+    @tree[path.join('/')] = []
     modules = get_modules(klass, path.reverse)
     @queue << output_node(klass)
 
