@@ -82,7 +82,7 @@ output
 can use from terminal by using `rotree` command.
 
 ```
-$ rotree Numeric                                                                                                                                       [master]
+$ rotree Numeric
 ```
 
 Ruby 2.3.3
