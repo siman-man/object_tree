@@ -10,6 +10,7 @@ opt_parse = OptionParser.new do |opt|
   opt.on('-c', '--[no-]color', 'color option [default true]') { |c| options[:color] = c }
   opt.on('-e `klass`', '--exclude', 'Exclude the given class/module name from object_tree.') { |klass| options[:exclude] << klass }
   opt.on('-r `library`', 'require the library before executing ObjectTree.create(klass)') { |name| options[:library] << name }
+  opt.on('-s `space size`', '--size', 'set indent space size [default 8]') { |s| options[:space_size] = s.to_i }
   opt.parse!(ARGV)
 end
 
