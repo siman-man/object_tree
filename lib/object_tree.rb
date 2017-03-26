@@ -23,6 +23,8 @@ class ObjectTree
     OPTIONS[:color] ? @queue.join : @queue.join.uncolorize
   end
 
+  private
+
   def output_node(klass)
     if klass.instance_of?(Class)
       "<#{?C.colorize(:green)}> #{klass}\n"
