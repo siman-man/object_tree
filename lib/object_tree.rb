@@ -16,7 +16,7 @@ class ObjectTree
   def initialize(klass)
     @tree = {}
     @queue = []
-    parse(klass)
+    walk(klass)
   end
 
   def to_s
@@ -41,7 +41,7 @@ class ObjectTree
     end_line ? ' ' * OPTIONS[:space_size] : I_LINE + ' ' * (OPTIONS[:space_size]-1)
   end
 
-  def parse(klass, space = '', path: [])
+  def walk(klass, space = '', path: [])
     path << klass
     @tree[path.join('/')] = []
     modules = get_modules(klass, path.reverse)
@@ -51,7 +51,7 @@ class ObjectTree
       next if OPTIONS[:exclude].include?(sub.to_s)
       @tree[path.join('/')] << sub
       @queue << get_line(end_line: modules.empty?, space: space)
-      parse(sub, space + get_space(end_line: modules.empty?), path: path.dup)
+      walk(sub, space + get_space(end_line: modules.empty?), path: path.dup)
     end
   end
 
